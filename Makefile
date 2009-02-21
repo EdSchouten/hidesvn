@@ -1,5 +1,5 @@
 SHLIB_NAME=	libhidesvn.so
-SRCS=		hidesvn.c
+SRCS=		libhidesvn.c
 WARNS?=		6
 
 LIBDIR?=	/usr/local/lib
