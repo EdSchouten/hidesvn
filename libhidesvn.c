@@ -74,9 +74,9 @@ readdir_r(DIR *d, struct dirent *dp, struct dirent **result)
 #if defined(__GLIBC__) && !defined(BUILT64)
 #undef	SYM
 #define	SYM(s)		s "64"
-#define readdir		readdir64
-#define readdir_r	readdir_r64
-#define dirent		dirent64
+#define	readdir		readdir64
+#define	readdir_r	readdir_r64
+#define	dirent		dirent64
 #define	BUILT64
 #include __FILE__
 #endif
