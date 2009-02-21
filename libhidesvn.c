@@ -24,6 +24,7 @@
  * SUCH DAMAGE.
  */
 
+#define	_GNU_SOURCE
 #include <dirent.h>
 #include <dlfcn.h>
 #include <stdlib.h>
