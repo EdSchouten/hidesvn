@@ -29,35 +29,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Yuck. */
-#ifdef __linux__
-#define	READDIR_SYM	"readdir64"
-#define	READDIR_R_SYM	"readdir_r64"
-#define	readdir		readdir64
-#define	readdir_r	readdir_r64
-#define	dirent		dirent64
-#else
-#define	READDIR_SYM	"readdir"
-#define	READDIR_R_SYM	"readdir_r"
+#ifndef SYM
+#define	SYM(s)	s
 #endif
-
-typedef struct dirent *readdir_t(DIR *);
-typedef int readdir_r_t(DIR *, struct dirent *, struct dirent **);
 
 struct dirent *
 readdir(DIR *d)
 {
-	static readdir_t *func;
+	static void *func;
 	struct dirent *dp;
 
 	if (func == NULL) {
-		func = (readdir_t *)dlsym(RTLD_NEXT, READDIR_SYM);
+		func = dlsym(RTLD_NEXT, SYM("readdir"));
 		if (func == NULL)
 			abort();
 	}
 	
 	do {
-		dp = func(d);
+		dp = ((struct dirent *(*)(DIR *))func)(d);
 	} while (dp != NULL && strcmp(dp->d_name, ".svn") == 0);
 
 	return (dp);
@@ -66,18 +55,28 @@ readdir(DIR *d)
 int
 readdir_r(DIR *d, struct dirent *dp, struct dirent **result)
 {
-	static readdir_r_t *func;
+	static void *func;
 	int ret;
 
 	if (func == NULL) {
-		func = (readdir_r_t *)dlsym(RTLD_NEXT, READDIR_R_SYM);
+		func = dlsym(RTLD_NEXT, SYM("readdir_r"));
 		if (func == NULL)
 			abort();
 	}
 	
 	do {
-		ret = func(d, dp, result);
+		ret = ((int (*)(DIR *, struct dirent *, struct dirent **))func)(d, dp, result);
 	} while (ret == 0 && strcmp(dp->d_name, ".svn") == 0);
 
 	return (ret);
 }
+
+#if defined(__GLIBC__) && !defined(BUILT64)
+#undef	SYM
+#define	SYM(s)		s "64"
+#define readdir		readdir64
+#define readdir_r	readdir_r64
+#define dirent		dirent64
+#define	BUILT64
+#include __FILE__
+#endif
