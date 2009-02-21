@@ -47,13 +47,14 @@ typedef int readdir_r_t(DIR *, struct dirent *, struct dirent **);
 struct dirent *
 readdir(DIR *d)
 {
-	struct dirent *dp;
 	static readdir_t *func;
+	struct dirent *dp;
 
-	if (func == NULL)
+	if (func == NULL) {
 		func = (readdir_t *)dlsym(RTLD_NEXT, READDIR_SYM);
-	if (func == NULL)
-		abort();
+		if (func == NULL)
+			abort();
+	}
 	
 	do {
 		dp = func(d);
@@ -68,10 +69,11 @@ readdir_r(DIR *d, struct dirent *dp, struct dirent **result)
 	static readdir_r_t *func;
 	int ret;
 
-	if (func == NULL)
+	if (func == NULL) {
 		func = (readdir_r_t *)dlsym(RTLD_NEXT, READDIR_R_SYM);
-	if (func == NULL)
-		abort();
+		if (func == NULL)
+			abort();
+	}
 	
 	do {
 		ret = func(d, dp, result);
