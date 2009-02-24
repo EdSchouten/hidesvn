@@ -27,28 +27,40 @@
  * SUCH DAMAGE.
  */
 
-#define	_GNU_SOURCE
-#include <dirent.h>
-#include <dlfcn.h>
-#include <stdlib.h>
-#include <string.h>
+struct dirent *
+readdir(DIR *d)
+{
+	static void *func;
+	struct dirent *dp;
 
-/*
- * Always build replacements for readdir()/readdir_r().
- */
+	if (func == NULL) {
+		func = dlsym(RTLD_NEXT, SYM("readdir"));
+		if (func == NULL)
+			abort();
+	}
+	
+	do {
+		dp = ((struct dirent *(*)(DIR *))func)(d);
+	} while (dp != NULL && strcmp(dp->d_name, ".svn") == 0);
 
-#define	SYM(s)		s
-#include "readdir.c"
+	return (dp);
+}
 
-/*
- * Also build replacements for readdir64()/readdir_r64() for glibc.
- */
+int
+readdir_r(DIR *d, struct dirent *dp, struct dirent **result)
+{
+	static void *func;
+	int ret;
 
-#if defined(__GLIBC__) && !defined(BUILT64)
-#undef	SYM
-#define	SYM(s)		s "64"
-#define	readdir		readdir64
-#define	readdir_r	readdir_r64
-#define	dirent		dirent64
-#include "readdir.c"
-#endif
+	if (func == NULL) {
+		func = dlsym(RTLD_NEXT, SYM("readdir_r"));
+		if (func == NULL)
+			abort();
+	}
+	
+	do {
+		ret = ((int (*)(DIR *, struct dirent *, struct dirent **))func)(d, dp, result);
+	} while (ret == 0 && strcmp(dp->d_name, ".svn") == 0);
+
+	return (ret);
+}
