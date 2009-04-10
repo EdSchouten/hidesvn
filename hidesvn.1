@@ -30,7 +30,7 @@
 .Os
 .Sh NAME
 .Nm hidesvn
-.Nd hide Subversion data directories
+.Nd hide version control system data directories
 .Sh SYNOPSIS
 .Nm
 .Ar command ...
@@ -38,7 +38,11 @@
 The
 .Nm
 command can be prefixed to any commands to hide
+.Pa .git ,
+.Pa .hg ,
 .Pa .svn
+and
+.Pa CVS
 directories from calls to
 .Fn readdir
 and
@@ -46,7 +50,7 @@ and
 This is especially useful when using commands like
 .Xr grep 1
 to search in directories recursively, but want to exclude any data files
-from Subversion from the results.
+from version control systems from the results.
 .Sh SEE ALSO
 .Xr readdir 3 ,
 .Xr readdir_r 3 ,

@@ -32,6 +32,8 @@ readdir(DIR *d)
 {
 	static void *func;
 	struct dirent *dp;
+	unsigned int i;
+	int c;
 
 	if (func == NULL) {
 		func = dlsym(RTLD_NEXT, SYM("readdir"));
@@ -39,18 +41,27 @@ readdir(DIR *d)
 			abort();
 	}
 	
-	do {
-		dp = ((struct dirent *(*)(DIR *))func)(d);
-	} while (dp != NULL && strcmp(dp->d_name, ".svn") == 0);
-
-	return (dp);
+	for (;;) {
+skip:		dp = ((struct dirent *(*)(DIR *))func)(d);
+		if (dp == NULL)
+			return (NULL);
+		for (i = 0; ext[i] != NULL; i++) {
+			c = strcmp(dp->d_name, ext[i]);
+			if (c == 0)
+				goto skip;
+			if (c < 0)
+				return (dp);
+		}
+		return (dp);
+	}
 }
 
 int
 readdir_r(DIR *d, struct dirent *dp, struct dirent **result)
 {
 	static void *func;
-	int ret;
+	int ret, c;
+	unsigned int i;
 
 	if (func == NULL) {
 		func = dlsym(RTLD_NEXT, SYM("readdir_r"));
@@ -58,9 +69,17 @@ readdir_r(DIR *d, struct dirent *dp, struct dirent **result)
 			abort();
 	}
 	
-	do {
-		ret = ((int (*)(DIR *, struct dirent *, struct dirent **))func)(d, dp, result);
-	} while (ret == 0 && strcmp(dp->d_name, ".svn") == 0);
-
-	return (ret);
+	for (;;) {
+skip:		ret = ((int (*)(DIR *, struct dirent *, struct dirent **))func)(d, dp, result);
+		if (ret != 0)
+			return (ret);
+		for (i = 0; ext[i] != NULL; i++) {
+			c = strcmp(dp->d_name, ext[i]);
+			if (c == 0)
+				goto skip;
+			if (c < 0)
+				return (ret);
+		}
+		return (ret);
+	}
 }

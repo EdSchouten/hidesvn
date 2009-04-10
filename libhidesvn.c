@@ -34,6 +34,12 @@
 #include <string.h>
 
 /*
+ * List of extensions to block. Keep this sorted.
+ */
+
+static const char *ext[] = { ".git", ".hg", ".svn", "CVS", NULL };
+
+/*
  * Always build replacements for readdir()/readdir_r().
  */
 
