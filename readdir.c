@@ -45,11 +45,11 @@ readdir(DIR *d)
 skip:		dp = ((struct dirent *(*)(DIR *))func)(d);
 		if (dp == NULL)
 			return (NULL);
-		for (i = 0; ext[i] != NULL; i++) {
-			c = strcmp(dp->d_name, ext[i]);
+		for (i = 0; hide[i] != NULL; i++) {
+			c = strcmp(dp->d_name, hide[i]);
 			if (c == 0)
 				goto skip;
-			if (c < 0)
+			if (c > 0)
 				return (dp);
 		}
 		return (dp);
@@ -73,11 +73,11 @@ readdir_r(DIR *d, struct dirent *dp, struct dirent **result)
 skip:		ret = ((int (*)(DIR *, struct dirent *, struct dirent **))func)(d, dp, result);
 		if (ret != 0)
 			return (ret);
-		for (i = 0; ext[i] != NULL; i++) {
-			c = strcmp(dp->d_name, ext[i]);
+		for (i = 0; hide[i] != NULL; i++) {
+			c = strcmp(dp->d_name, hide[i]);
 			if (c == 0)
 				goto skip;
-			if (c < 0)
+			if (c > 0)
 				return (ret);
 		}
 		return (ret);

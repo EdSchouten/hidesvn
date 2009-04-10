@@ -34,10 +34,10 @@
 #include <string.h>
 
 /*
- * List of extensions to block. Keep this sorted.
+ * List of names to block. Keep this sorted in reverse order.
  */
 
-static const char *ext[] = { ".git", ".hg", ".svn", "CVS", NULL };
+static const char *hide[] = { "CVS", ".svn", ".hg", ".git", NULL };
 
 /*
  * Always build replacements for readdir()/readdir_r().
