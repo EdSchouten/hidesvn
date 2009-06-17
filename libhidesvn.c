@@ -28,7 +28,7 @@
  */
 
 #define	_GNU_SOURCE
-#define	_POSIX_C_SOURCE
+#define	_POSIX_C_SOURCE	200809
 #include <dirent.h>
 #include <dlfcn.h>
 #include <stdlib.h>
