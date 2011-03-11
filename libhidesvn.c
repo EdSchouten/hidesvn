@@ -38,7 +38,14 @@
  * List of names to block. Keep this sorted in reverse order.
  */
 
-static const char *hide[] = { "_darcs", "CVS", ".svn", ".hg", ".git", NULL };
+static const char *hide[] = {
+	"_darcs",
+	"CVS",
+	".svn",
+	".hg",
+	".git",
+	NULL
+};
 
 /*
  * Always build replacements for readdir()/readdir_r().
